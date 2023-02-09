@@ -22,8 +22,28 @@ public class UserStatus {
                 userIsAdmin);*/
     }
 
-    private int convertToInt(String userStatusBytes) {
-        return Integer.decode(userStatusBytes);
+    public String getAuthorisationStatus() {
+        // 0,0
+        if (!this.userIsAuthorised && !this.userIsAdmin) {
+            return "DisabledOperator";
+        }
+        // 0,1
+        if (!this.userIsAuthorised) {
+            return "DisabledAdmin";
+        }
+        // 1,0
+        if (!this.userIsAdmin) {
+            return "AuthorisedOperator";
+        }
+        return "AuthorisedAdmin";
+    }
+
+    public String getTrainingStatus() {
+        if (userIsTrainedOnDevice) {
+            return "Trained";
+        }
+        return "Untrained";
+
     }
 
     public Boolean getUserIsAuthorised() {

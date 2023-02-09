@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    private Map<String, UserStatus> currentUsers = new HashMap<String, UserStatus>();
+    private Map<String, User> currentUsers = new HashMap<String, User>();
     private int currentDeviceId = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             InputStream inputStreamPortal = res.openRawResource(R.raw.portaluserlist);
             BufferedReader bufferedReaderDevice = new BufferedReader(new InputStreamReader(inputStreamDevice));
             BufferedReader bufferedReaderPortal = new BufferedReader(new InputStreamReader(inputStreamPortal));
-            String outPutFileName = "OutputFile.txt";
+            String outPutFileName = "DeviceUserListUpdated.txt";
             FileOutputStream outputStream = openFileOutput(outPutFileName, Context.MODE_PRIVATE);
 
             currentUsers.clear();
@@ -57,10 +57,9 @@ public class MainActivity extends AppCompatActivity {
                     if (currentUsers.containsKey(uuid)) {
                         String textToWrite = String.format("Duplicate uuid %s%n", uuid);
                         System.out.printf(textToWrite);
-                        outputStream.write(textToWrite.getBytes());
                     }
                     // populate dictionary of currentUsers
-                    currentUsers.put(uuid, user.getUserStatus());
+                    currentUsers.put(uuid, user);
                 }
                 // read next line
                 line = bufferedReaderDevice.readLine();
@@ -87,9 +86,10 @@ public class MainActivity extends AppCompatActivity {
                         if (currentUsers.containsKey(portalUuid)) {
                             // update the user
                             System.out.printf(">>>>>>Update portal user %s   %s%n", portalUuid,statusString);
-                            currentUsers.put(portalUuid, user.getUserStatus());
+                            currentUsers.put(portalUuid, user);
                         } else {
                             // New user
+                            currentUsers.put(portalUuid, user);
                             System.out.printf("Portal has new user %s%n", portalUuid);
                         }
                     }
@@ -99,13 +99,20 @@ public class MainActivity extends AppCompatActivity {
             }
             bufferedReaderPortal.close();
 
+            // Start producing the output file by looping through the users
+            for(User user : currentUsers.values()) {
+                System.out.println(user.getOutPutString());
+                outputStream.write(user.getOutPutString().getBytes());
+            }
+
             outputStream.close();
             System.out.printf("Dictionary size %d%n", currentUsers.size());
-            UserStatus s = currentUsers.get("7be519b2-96f6-4b4c-b47b-39c555186ffc");
+            User s = currentUsers.get("7be519b2-96f6-4b4c-b47b-39c555186ffc");
             System.out.printf("         userIsAuthorised:%b, userIsTrainedOnDevice:%b, userIsAdmin:%b%n",
-                    s.getUserIsAuthorised(),
-                    s.getUserIsTrainedOnDevice(),
-                    s.getUserIsAdmin());
+                    s.getUserStatus().getUserIsAuthorised(),
+                    s.getUserStatus().getUserIsTrainedOnDevice(),
+                    s.getUserStatus().getUserIsAdmin());
+            System.out.println(s.getOutPutString());
         } catch (Exception e) {
             System.out.printf("Unable to parse, reason: %s",e.getMessage());
         }

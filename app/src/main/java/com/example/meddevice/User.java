@@ -18,6 +18,16 @@ public class User {
         this.userStatus = new UserStatus(userStatusBytes);
     }
 
+
+    public String getOutPutString() {
+        String tab = "\t";
+        String carriageReturn = "\n";
+        return getUserId() + tab +
+                getDeviceId() + tab +
+                getUserStatus().getAuthorisationStatus() + tab +
+                getUserStatus().getTrainingStatus()+ carriageReturn;
+    }
+
     public String getUserId() {
         return userId;
     }
