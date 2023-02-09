@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(@NonNull String s) {
-                        System.out.printf("********Processing DONE for %s Users *********", s);
+                        System.out.printf("********Processing DONE for %s Users *********%n", s);
                         System.out.printf("Thread %d  %s%n", Thread.currentThread().getId(),Thread.currentThread().getName());
                     }
 

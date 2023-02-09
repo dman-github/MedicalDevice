@@ -30,11 +30,11 @@ public class DeviceUserManager {
     }
 
    public String runProcessorInBackground()  {
-            this.getDeviceUserListFromFile();
-            this.updateFromPortalFromFile();
-            this.outputResults();
-            System.out.printf("Thread %d  %s%n", Thread.currentThread().getId(),Thread.currentThread().getName());
-            return Integer.toString(currentUsers.size());
+        // Executed in background thread
+       this.getDeviceUserListFromFile();
+       this.updateFromPortalFromFile();
+       this.outputResults();
+       return Integer.toString(currentUsers.size());
    }
 
     private void getDeviceUserListFromFile() {
@@ -50,7 +50,6 @@ public class DeviceUserManager {
                     String uuid = thisLine[0];
                     String deviceId = thisLine[1];
                     String statusString = thisLine[2];
-                    System.out.println(uuid);
                     User user = new User(uuid,
                             Integer.parseUnsignedInt(deviceId),
                             statusString);
@@ -58,10 +57,6 @@ public class DeviceUserManager {
                         // copy the device Id from the first user. All the users on the
                         // deviceUserList have the same device.
                         currentDeviceId = user.getDeviceId();
-                    }
-                    if (currentUsers.containsKey(uuid)) {
-                        String textToWrite = String.format("Duplicate uuid %s%n", uuid);
-                        System.out.printf(textToWrite);
                     }
                     // populate dictionary of currentUsers
                     currentUsers.put(uuid, user);
@@ -96,12 +91,10 @@ public class DeviceUserManager {
                         // check if the portal uuid is present in the current list of users
                         if (currentUsers.containsKey(portalUuid)) {
                             // update the user
-                            System.out.printf(">>>>>>Update portal user %s   %s%n", portalUuid, statusString);
                             currentUsers.put(portalUuid, user);
                         } else {
                             // New user
                             currentUsers.put(portalUuid, user);
-                            System.out.printf("Portal has new user %s%n", portalUuid);
                         }
                     }
                 }
@@ -119,7 +112,6 @@ public class DeviceUserManager {
         try {
             // Start producing the output file by looping through the users
             for (User user : currentUsers.values()) {
-                System.out.println(user.getOutPutString());
                 outputStream.write(user.getOutPutString().getBytes());
             }
             outputStream.close();
