@@ -1,5 +1,7 @@
 package com.example.meddevice;
 
+import android.content.res.Resources;
+import io.reactivex.rxjava3.core.Observable;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -8,11 +10,34 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DeviceUserManager {
-    private Map<String, User> currentUsers = new HashMap<String, User>();
-    private int currentDeviceId = -1;
+import io.reactivex.rxjava3.core.Observable;
 
-    void getDeviceUserListFromFile(InputStream inputStreamDevice) {
+public class DeviceUserManager {
+    private final Map<String, User> currentUsers = new HashMap<String, User>();
+    private int currentDeviceId = -1;
+    private final InputStream inputStreamDevice;
+    private final InputStream inputStreamPortal;
+    private final FileOutputStream outputStream;
+    public Observable<String> task;
+
+    public DeviceUserManager(InputStream deviceStream,
+                             InputStream portalStream,
+                             FileOutputStream outputStream) {
+        this.inputStreamDevice = deviceStream;
+        this.inputStreamPortal = portalStream;
+        this.outputStream = outputStream;
+        task = Observable.fromCallable(this::runProcessorInBackground);
+    }
+
+   public String runProcessorInBackground()  {
+            this.getDeviceUserListFromFile();
+            this.updateFromPortalFromFile();
+            this.outputResults();
+            System.out.printf("Thread %d  %s%n", Thread.currentThread().getId(),Thread.currentThread().getName());
+            return Integer.toString(currentUsers.size());
+   }
+
+    private void getDeviceUserListFromFile() {
         try {
             BufferedReader bufferedReaderDevice = new BufferedReader(new InputStreamReader(inputStreamDevice));
             currentUsers.clear();
@@ -50,7 +75,7 @@ public class DeviceUserManager {
         }
     }
 
-    void updateFromPortalFromFile(InputStream inputStreamPortal) {
+    private void updateFromPortalFromFile() {
         try {
             BufferedReader bufferedReaderPortal = new BufferedReader(new InputStreamReader(inputStreamPortal));
             // Read the portalUserList and only update the users that are the current device
@@ -90,7 +115,7 @@ public class DeviceUserManager {
 
     }
 
-    void outputResults(FileOutputStream outputStream) {
+    private void outputResults() {
         try {
             // Start producing the output file by looping through the users
             for (User user : currentUsers.values()) {

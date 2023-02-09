@@ -5,3 +5,7 @@
 .gradle/7.5/fileHashes/fileHashes.lock
 .gradle/7.5/fileHashes/resourceHashesCache.bin
 .gradle/buildOutputCleanup/buildOutputCleanup.lock
+.gradle/7.5/checksums/checksums.lock
+.gradle/7.5/checksums/md5-checksums.bin
+.gradle/7.5/checksums/sha1-checksums.bin
+.gradle/buildOutputCleanup/outputFiles.bin

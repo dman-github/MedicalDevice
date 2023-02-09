@@ -2,22 +2,25 @@ package com.example.meddevice;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 
-import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.Format;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 
 public class MainActivity extends AppCompatActivity {
-    DeviceUserManager deviceUserManager = new DeviceUserManager();
+    DeviceUserManager deviceUserManager;
+    private Disposable mDisposable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,12 +32,34 @@ public class MainActivity extends AppCompatActivity {
             InputStream inputStreamPortal = res.openRawResource(R.raw.portaluserlist);
             String outPutFileName = "DeviceUserListUpdated.txt";
             FileOutputStream outputStream = openFileOutput(outPutFileName, Context.MODE_PRIVATE);
-            deviceUserManager.getDeviceUserListFromFile(inputStreamDevice);
-            deviceUserManager.updateFromPortalFromFile(inputStreamPortal);
-            deviceUserManager.outputResults(outputStream);
-            System.out.println("********Processing DONE*********");
+            deviceUserManager = new DeviceUserManager(inputStreamDevice,
+                    inputStreamPortal,
+                    outputStream);
         } catch (Exception e) {
             System.out.printf("Unable to parse, reason: %s",e.getLocalizedMessage());
         }
+        deviceUserManager.task
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@NonNull String s) {
+                        System.out.printf("********Processing DONE for %s Users *********", s);
+                        System.out.printf("Thread %d  %s%n", Thread.currentThread().getId(),Thread.currentThread().getName());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                    }
+                });
     }
 }
