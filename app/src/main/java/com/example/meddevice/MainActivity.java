@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
             FileOutputStream outputStream = openFileOutput(outPutFileName, Context.MODE_PRIVATE);
 
             currentUsers.clear();
-
             /* Read the device user list and create the User objects first */
             String line = bufferedReaderDevice.readLine();
             while (line != null) {
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
             }
             bufferedReaderDevice.close();
 
-            // Read the portalUserList and only update the users that
+            // Read the portalUserList and only update the users that are the current device
             line = bufferedReaderPortal.readLine();
             while (line != null) {
                 String[] thisLine = line.split("\t");
@@ -77,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
                     String portalDeviceId = thisLine[1];
                     String statusString = thisLine[2];
                     // If the deviceId is the same as this system then we update the user data
-                    int deviceIdUnsignedint = Integer.parseUnsignedInt(portalDeviceId);
-                    if (deviceIdUnsignedint == currentDeviceId) {
+                    int deviceIdUint = Integer.parseUnsignedInt(portalDeviceId);
+                    if (deviceIdUint == currentDeviceId) {
                         User user = new User(portalUuid,
-                                deviceIdUnsignedint,
+                                deviceIdUint,
                                 statusString);
                         // check if the portal uuid is present in the current list of users
                         if (currentUsers.containsKey(portalUuid)) {
@@ -104,15 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(user.getOutPutString());
                 outputStream.write(user.getOutPutString().getBytes());
             }
-
             outputStream.close();
-            System.out.printf("Dictionary size %d%n", currentUsers.size());
-            User s = currentUsers.get("7be519b2-96f6-4b4c-b47b-39c555186ffc");
-            System.out.printf("         userIsAuthorised:%b, userIsTrainedOnDevice:%b, userIsAdmin:%b%n",
-                    s.getUserStatus().getUserIsAuthorised(),
-                    s.getUserStatus().getUserIsTrainedOnDevice(),
-                    s.getUserStatus().getUserIsAdmin());
-            System.out.println(s.getOutPutString());
         } catch (Exception e) {
             System.out.printf("Unable to parse, reason: %s",e.getMessage());
         }
