@@ -21,10 +21,15 @@ public class User {
 
     public String getOutPutString() {
         String tab = "\t";
+        String doubleTab = "\t\t";
         String carriageReturn = "\n";
+        String finalTab = tab;
+        if (getUserStatus().shouldUseDoubleTab()) {
+            finalTab = doubleTab;
+        }
         return getUserId() + tab +
                 getDeviceId() + tab +
-                getUserStatus().getAuthorisationStatus() + tab +
+                getUserStatus().getAuthorisationStatus() + finalTab +
                 getUserStatus().getTrainingStatus()+ carriageReturn;
     }
 

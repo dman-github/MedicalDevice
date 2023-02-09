@@ -38,6 +38,21 @@ public class UserStatus {
         return "AuthorisedAdmin";
     }
 
+    public boolean shouldUseDoubleTab()  {
+        // Double tab is needed to make sure the last column rows values are all aligned
+        // This depends on the text length, below are the 2 smallest strings, Disabled Admin and
+        // Authorised admin
+        if (!this.userIsAuthorised && this.userIsAdmin) {
+            // Disabled Admin
+            return true;
+        }
+        if (this.userIsAuthorised && this.userIsAdmin) {
+            //Authorised Admin
+            return true;
+        }
+        return false;
+    }
+
     public String getTrainingStatus() {
         if (userIsTrainedOnDevice) {
             return "Trained";
