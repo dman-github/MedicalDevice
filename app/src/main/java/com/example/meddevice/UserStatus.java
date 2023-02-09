@@ -16,10 +16,6 @@ public class UserStatus {
         this.userIsTrainedOnDevice = ((data & 0x40) != 0);
         // user is administrator when 0
         this.userIsAdmin = ((data & 0x20) == 0);
-        /*System.out.printf("userIsAuthorised:%b, userIsTrainedOnDevice:%b, userIsAdmin:%b%n",
-                userIsAuthorised,
-                userIsTrainedOnDevice,
-                userIsAdmin);*/
     }
 
     public String getAuthorisationStatus() {
